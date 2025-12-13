@@ -1,0 +1,11 @@
+{
+    "id": "nodebb-plugin-ieu-scraper",
+    "name": "IEU Etkinlik Scraper",
+    "description": "It pulls the events and presents them as a widget",
+    "library": "./library.js",
+    "hooks": [
+        { "hook": "static:app.load", "method": "init" },
+        { "hook": "filter:widgets.getWidgets", "method": "defineWidgets" },
+        { "hook": "filter:widget.render:ieu-events-widget", "method": "renderWidget" }
+    ]
+}
