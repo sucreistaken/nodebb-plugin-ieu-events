@@ -8,6 +8,23 @@ const NodeCache = require('node-cache');
 const myCache = new NodeCache({ stdTTL: 3600 });
 const plugin = {};
 
+const turkishMonths = {
+    'ocak': 0, 'şubat': 1, 'mart': 2, 'nisan': 3,
+    'mayıs': 4, 'haziran': 5, 'temmuz': 6, 'ağustos': 7,
+    'eylül': 8, 'ekim': 9, 'kasım': 10, 'aralık': 11
+};
+
+function parseTurkishDate(dateStr) {
+    if (!dateStr) return null;
+    const parts = dateStr.trim().toLowerCase().match(/(\d{1,2})\s+([a-zçğıöşü]+)\s+(\d{4})/);
+    if (!parts) return null;
+    const day = parseInt(parts[1], 10);
+    const month = turkishMonths[parts[2]];
+    const year = parseInt(parts[3], 10);
+    if (month === undefined || isNaN(day) || isNaN(year)) return null;
+    return new Date(year, month, day, 23, 59, 59);
+}
+
 plugin.init = async function (params) {};
 
 plugin.defineWidgets = async function (widgets) {
@@ -21,7 +38,7 @@ plugin.defineWidgets = async function (widgets) {
 };
 
 async function getEvents() {
-    const cached = myCache.get("ieu_data_pro_v2");
+    const cached = myCache.get("ieu_data_pro_v3");
     if (cached) return cached;
 
     try {
@@ -59,6 +76,10 @@ async function getEvents() {
             // Düzeltmeler
             if (img && !img.startsWith('http')) img = 'https://club.ieu.edu.tr' + img;
             if (!img) img = 'https://club.ieu.edu.tr/sites/all/themes/ieu_theme/logo.png';
+
+            // Tarihi geçmiş etkinlikleri atla
+            const eventDate = parseTurkishDate(fullDate);
+            if (eventDate && eventDate < new Date()) return;
 
             if (title) events.push({ id: i, title, img, date, club, fullDesc, location, fullDate });
         });
@@ -459,7 +480,7 @@ async function getEvents() {
             </script>
         `;
 
-        myCache.set("ieu_data_pro_v2", finalHtml);
+        myCache.set("ieu_data_pro_v3", finalHtml);
         return finalHtml;
 
     } catch (e) {

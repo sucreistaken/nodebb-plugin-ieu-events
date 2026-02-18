@@ -1,6 +1,6 @@
 {
   "name": "nodebb-plugin-ieu-scraper",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "It pulls IEU club events from the school’s website.",
   "main": "library.js",
   "nbbpm": {
