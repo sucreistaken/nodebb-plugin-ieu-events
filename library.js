@@ -52,7 +52,7 @@ plugin.defineWidgets = async function (widgets) {
 };
 
 async function getEvents() {
-    const cached = myCache.get("ieu_data_pro_v3");
+    const cached = myCache.get("ieu_data_pro_v4");
     if (cached) return cached;
 
     try {
@@ -120,12 +120,15 @@ async function getEvents() {
             slidesHtml += `
                 <div class="ieu-slide ${index === 0 ? 'active' : ''}" data-index="${index}">
                     <div class="ieu-slide-bg" style="background-image: url('${e.img}');"></div>
+                    <div class="ieu-slide-gradient"></div>
                     <div class="ieu-slide-content">
                         <div class="ieu-card-img" onclick="openIeuModal(${e.id})">
                             <img src="${e.img}">
                         </div>
                         <div class="ieu-card-info">
-                            <span class="ieu-date-badge">${e.date}</span>
+                            <div class="ieu-badges">
+                                <span class="ieu-date-badge">${e.date}</span>
+                            </div>
                             <h3 class="ieu-card-title"
                                 title="${safeTitleAttr}"
                                 onclick="openIeuModal(${e.id})">${shortTitle}</h3>
@@ -146,14 +149,15 @@ async function getEvents() {
                             <span class="ieu-close-btn" onclick="closeIeuModal(${e.id})">&times;</span>
                         </div>
                         <div class="ieu-modal-body">
-                            <div style="text-align:center; margin-bottom:15px;">
-                                <img src="${e.img}" style="max-height:180px; border-radius:8px;">
+                            <div style="text-align:center; margin-bottom:16px;">
+                                <img src="${e.img}">
                             </div>
-                            <div style="background:#f8f9fa; padding:10px; border-radius:6px; margin-bottom:15px; font-size:13px; color:#555;">
-                                <p><strong><i class="fa fa-clock-o"></i> Tarih:</strong> ${e.fullDate}</p>
-                                <p><strong><i class="fa fa-map-marker"></i> Konum:</strong> ${e.location}</p>
+                            <div class="ieu-modal-meta">
+                                ${e.club ? `<p><strong><i class="fa fa-users"></i> Kulüp:</strong> ${e.club}</p>` : ''}
+                                ${e.fullDate ? `<p><strong><i class="fa fa-calendar"></i> Tarih:</strong> ${e.fullDate}</p>` : ''}
+                                ${e.location ? `<p><strong><i class="fa fa-map-marker"></i> Konum:</strong> ${e.location}</p>` : ''}
                             </div>
-                            <div style="font-size:14px; line-height:1.6; color:#333;">${e.fullDesc || 'Açıklama yok.'}</div>
+                            <div style="font-size:14px; line-height:1.7; color:#333;">${e.fullDesc || 'Açıklama yok.'}</div>
                         </div>
                         <div class="ieu-modal-footer">
                             <button onclick="closeIeuModal(${e.id})">Kapat</button>
@@ -163,17 +167,20 @@ async function getEvents() {
             `;
         });
 
+        const dotsHtml = events.map((e, index) =>
+            `<span class="ieu-dot ${index === 0 ? 'active' : ''}" onclick="ieuGoToSlide(${index})"></span>`
+        ).join('');
+
         const finalHtml = `
             <style>
                 .ieu-widget-wrapper {
                     position: relative;
-                    height: 320px;
+                    height: 480px;
                     overflow: hidden;
-                    background: #2c3e50;
-                    border-radius: 12px;
+                    background: linear-gradient(160deg, #1a3a3a 0%, #0d2222 100%);
+                    border-radius: 16px;
                     margin-bottom: 20px;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-                    border: 1px solid #ddd;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
                 }
                 .ieu-slide {
                     position: absolute;
@@ -181,11 +188,8 @@ async function getEvents() {
                     height: 100%;
                     top: 0; left: 0;
                     opacity: 0;
-                    transition: opacity 0.6s ease-in-out;
+                    transition: opacity 0.6s ease;
                     pointer-events: none;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
                 }
                 .ieu-slide.active {
                     opacity: 1;
@@ -197,137 +201,212 @@ async function getEvents() {
                     inset: 0;
                     background-size: cover;
                     background-position: center;
-                    filter: blur(15px) brightness(0.4);
+                    filter: blur(20px) brightness(0.3);
+                    transform: scale(1.15);
                     z-index: 1;
+                }
+                .ieu-slide-gradient {
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient(180deg,
+                        rgba(15,34,34,0.2) 0%,
+                        rgba(15,34,34,0.05) 30%,
+                        rgba(15,34,34,0.5) 65%,
+                        rgba(15,34,34,0.95) 100%);
+                    z-index: 2;
                 }
                 .ieu-slide-content {
                     position: relative;
                     z-index: 3;
                     display: flex;
-                    align-items: center;
-                    width: 90%;
-                    max-width: 800px;
-                    gap: 25px;
+                    flex-direction: column;
+                    height: 100%;
+                    padding: 18px 18px 50px 18px;
+                    box-sizing: border-box;
                 }
                 .ieu-card-img {
-                    width: 160px;
-                    height: 220px;
+                    width: 100%;
+                    height: 200px;
                     flex-shrink: 0;
-                    border-radius: 10px;
+                    border-radius: 12px;
                     overflow: hidden;
-                    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
                     cursor: pointer;
-                    border: 2px solid rgba(255,255,255,0.2);
+                    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+                    border: 1px solid rgba(255,255,255,0.08);
                     transition: transform 0.3s;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: rgba(0,0,0,0.6);
                 }
-                .ieu-card-img:hover { transform: scale(1.03); }
+                .ieu-card-img:hover { transform: scale(1.02); }
                 .ieu-card-img img {
                     width: 100%;
-                    height: auto;
-                    max-height: 100%;
-                    object-fit: contain;
+                    height: 100%;
+                    object-fit: cover;
                 }
                 .ieu-card-info {
                     color: #fff;
-                    flex: 1;
+                    width: 100%;
                     text-align: left;
+                    margin-top: 14px;
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 0;
+                }
+                .ieu-badges {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 6px;
+                    margin-bottom: 10px;
                 }
                 .ieu-date-badge {
-                    background: #f1c40f;
-                    color: #2c3e50;
-                    padding: 4px 8px;
-                    border-radius: 4px;
+                    background: #2ecc71;
+                    color: #fff;
+                    padding: 4px 10px;
+                    border-radius: 5px;
                     font-size: 11px;
-                    font-weight: 800;
+                    font-weight: 700;
                     text-transform: uppercase;
-                    margin-bottom: 8px;
-                    display: inline-block;
+                }
+                .ieu-type-badge {
+                    background: rgba(255,255,255,0.12);
+                    color: rgba(255,255,255,0.85);
+                    padding: 4px 10px;
+                    border-radius: 5px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    border: 1px solid rgba(255,255,255,0.08);
                 }
                 .ieu-card-title {
-                    font-size: 18px;
-                    margin: 0 0 10px 0;
+                    font-size: 17px;
+                    margin: 0 0 6px 0;
                     font-weight: 700;
-                    line-height: 1.3;
-                    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+                    line-height: 1.35;
                     cursor: pointer;
                     display: -webkit-box;
                     -webkit-line-clamp: 2;
                     -webkit-box-orient: vertical;
                     overflow: hidden;
+                    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+                    transition: color 0.2s;
                 }
+                .ieu-card-title:hover { color: #2ecc71; }
                 .ieu-card-club {
                     font-size: 13px;
-                    opacity: 0.9;
-                    margin-bottom: 15px;
-                    color: #bdc3c7;
-                    white-space: nowrap;
+                    line-height: 1.45;
+                    color: rgba(255,255,255,0.6);
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
                     overflow: hidden;
-                    text-overflow: ellipsis;
+                    margin-bottom: auto;
                 }
                 .ieu-btn-detail {
-                    background: #3498db;
+                    align-self: flex-start;
+                    background: linear-gradient(135deg, #2ecc71, #27ae60);
                     color: #fff;
                     border: none;
-                    padding: 8px 20px;
-                    border-radius: 20px;
+                    padding: 9px 24px;
+                    border-radius: 22px;
+                    font-size: 13px;
                     font-weight: 600;
                     cursor: pointer;
-                    transition: background 0.2s;
+                    margin-top: 12px;
+                    transition: transform 0.2s, box-shadow 0.2s;
+                    box-shadow: 0 3px 12px rgba(46,204,113,0.25);
                 }
-                .ieu-btn-detail:hover { background: #2980b9; }
-                .ieu-nav-btn {
+                .ieu-btn-detail:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 5px 16px rgba(46,204,113,0.4);
+                }
+                /* Bottom bar: nav + dots */
+                .ieu-bottom-bar {
                     position: absolute;
-                    top: 50%;
-                    transform: translateY(-50%);
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
                     z-index: 10;
-                    background: rgba(0,0,0,0.3);
-                    border: none;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 10px 14px;
+                    gap: 10px;
+                }
+                .ieu-nav-btn {
+                    background: rgba(255,255,255,0.1);
+                    border: 1px solid rgba(255,255,255,0.12);
                     color: #fff;
-                    width: 40px;
-                    height: 40px;
+                    width: 30px;
+                    height: 30px;
                     border-radius: 50%;
                     cursor: pointer;
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    font-size: 12px;
+                    flex-shrink: 0;
                     transition: background 0.2s;
                 }
-                .ieu-nav-btn:hover { background: rgba(0,0,0,0.6); }
-                .ieu-prev { left: 15px; }
-                .ieu-next { right: 15px; }
+                .ieu-nav-btn:hover { background: rgba(255,255,255,0.2); }
+                .ieu-dots {
+                    display: flex;
+                    gap: 5px;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                }
+                .ieu-dot {
+                    width: 7px;
+                    height: 7px;
+                    border-radius: 50%;
+                    background: rgba(255,255,255,0.25);
+                    cursor: pointer;
+                    transition: background 0.3s, transform 0.3s;
+                }
+                .ieu-dot.active {
+                    background: #2ecc71;
+                    transform: scale(1.4);
+                }
+                .ieu-dot:hover { background: rgba(255,255,255,0.5); }
+                .ieu-counter {
+                    position: absolute;
+                    top: 14px;
+                    right: 14px;
+                    z-index: 10;
+                    background: rgba(0,0,0,0.45);
+                    color: rgba(255,255,255,0.75);
+                    padding: 3px 10px;
+                    border-radius: 10px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    backdrop-filter: blur(4px);
+                }
 
                 /* Modal */
                 .ieu-modal-overlay {
                     position: fixed;
                     top: 0; left: 0;
                     width: 100%; height: 100%;
-                    background: rgba(0,0,0,0.8);
+                    background: rgba(0,0,0,0.85);
                     z-index: 10000;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    backdrop-filter: blur(5px);
+                    backdrop-filter: blur(6px);
                 }
                 .ieu-modal-box {
                     background: #fff;
-                    width: 90%;
+                    width: 92%;
                     max-width: 600px;
-                    max-height: 85vh;
-                    border-radius: 12px;
+                    max-height: 88vh;
+                    border-radius: 14px;
                     overflow: hidden;
                     display: flex;
                     flex-direction: column;
-                    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+                    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
                     animation: ieuPop 0.3s ease-out;
                 }
                 .ieu-modal-header {
-                    padding: 15px 20px;
-                    background: #f8f9fa;
-                    border-bottom: 1px solid #eee;
+                    padding: 16px 20px;
+                    background: linear-gradient(135deg, #f0faf4, #e8f5ec);
+                    border-bottom: 1px solid #d4edda;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
@@ -336,12 +415,17 @@ async function getEvents() {
                     margin: 0;
                     font-size: 16px;
                     font-weight: 700;
-                    color: #333;
+                    color: #1a3a3a;
+                    line-height: 1.4;
+                    flex: 1;
+                    padding-right: 10px;
                 }
                 .ieu-close-btn {
-                    font-size: 24px;
+                    font-size: 26px;
                     cursor: pointer;
                     color: #999;
+                    line-height: 1;
+                    transition: color 0.2s;
                 }
                 .ieu-close-btn:hover { color: #333; }
                 .ieu-modal-body {
@@ -349,39 +433,55 @@ async function getEvents() {
                     overflow-y: auto;
                     color: #444;
                 }
+                .ieu-modal-body img {
+                    max-height: 200px;
+                    border-radius: 10px;
+                }
+                .ieu-modal-meta {
+                    background: #f0faf4;
+                    padding: 12px 14px;
+                    border-radius: 8px;
+                    margin-bottom: 14px;
+                    font-size: 13px;
+                    color: #555;
+                    border: 1px solid #e0f0e6;
+                }
+                .ieu-modal-meta p { margin: 3px 0; }
+                .ieu-modal-meta i { width: 16px; color: #27ae60; }
                 .ieu-modal-footer {
-                    padding: 15px;
-                    text-align: right;
+                    padding: 14px 20px;
                     border-top: 1px solid #eee;
-                    background: #fff;
+                    background: #fafafa;
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 10px;
                 }
                 .ieu-modal-footer button {
                     background: #eee;
                     border: none;
-                    padding: 8px 16px;
-                    border-radius: 6px;
+                    padding: 9px 18px;
+                    border-radius: 8px;
                     cursor: pointer;
                     color: #333;
+                    font-weight: 500;
                 }
+                .ieu-modal-footer button:hover { background: #ddd; }
+                .ieu-btn-link {
+                    background: linear-gradient(135deg, #2ecc71, #27ae60);
+                    color: #fff;
+                    border: none;
+                    padding: 9px 18px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    text-decoration: none;
+                    font-size: 14px;
+                    font-weight: 600;
+                    transition: transform 0.2s;
+                }
+                .ieu-btn-link:hover { transform: translateY(-1px); }
                 @keyframes ieuPop {
-                    from { transform: scale(0.9); opacity: 0; }
+                    from { transform: scale(0.92); opacity: 0; }
                     to { transform: scale(1); opacity: 1; }
-                }
-
-                /* Dar kolon / mobil uyumu */
-                @media (max-width: 900px) {
-                    .ieu-slide-content {
-                        flex-direction: column;
-                        text-align: center;
-                    }
-                    .ieu-card-info { text-align: center; }
-                    .ieu-card-img {
-                        width: 140px;
-                        height: 180px;
-                        margin: 0 auto 10px auto;
-                        border-radius: 50%;
-                    }
-                    .ieu-widget-wrapper { height: 380px; }
                 }
             </style>
 
@@ -389,8 +489,12 @@ async function getEvents() {
                 <div id="ieu-slider-inner">
                     ${slidesHtml}
                 </div>
-                <button class="ieu-nav-btn ieu-prev" onclick="ieuMoveSlide(-1)"><i class="fa fa-chevron-left"></i></button>
-                <button class="ieu-nav-btn ieu-next" onclick="ieuMoveSlide(1)"><i class="fa fa-chevron-right"></i></button>
+                <div class="ieu-counter" id="ieu-counter">1 / ${events.length}</div>
+                <div class="ieu-bottom-bar">
+                    <button class="ieu-nav-btn" onclick="ieuMoveSlide(-1)"><i class="fa fa-chevron-left"></i></button>
+                    <div class="ieu-dots">${dotsHtml}</div>
+                    <button class="ieu-nav-btn" onclick="ieuMoveSlide(1)"><i class="fa fa-chevron-right"></i></button>
+                </div>
             </div>
 
             ${modalsHtml}
@@ -407,16 +511,26 @@ async function getEvents() {
 
                 function ieuShowSlide(n) {
                     var slides = document.querySelectorAll('.ieu-slide');
+                    var dots = document.querySelectorAll('.ieu-dot');
+                    var counter = document.getElementById('ieu-counter');
                     if (!slides.length) return;
                     if (n >= window.ieuTotalSlides) window.ieuCurrentSlide = 0;
                     else if (n < 0) window.ieuCurrentSlide = window.ieuTotalSlides - 1;
                     else window.ieuCurrentSlide = n;
                     slides.forEach(function (s) { s.classList.remove('active'); });
                     slides[window.ieuCurrentSlide].classList.add('active');
+                    dots.forEach(function (d) { d.classList.remove('active'); });
+                    if (dots[window.ieuCurrentSlide]) dots[window.ieuCurrentSlide].classList.add('active');
+                    if (counter) counter.textContent = (window.ieuCurrentSlide + 1) + ' / ' + window.ieuTotalSlides;
                 }
 
                 window.ieuMoveSlide = function (n) {
                     ieuShowSlide(window.ieuCurrentSlide + n);
+                    ieuResetTimer();
+                };
+
+                window.ieuGoToSlide = function (n) {
+                    ieuShowSlide(n);
                     ieuResetTimer();
                 };
 
@@ -457,7 +571,7 @@ async function getEvents() {
             </script>
         `;
 
-        myCache.set("ieu_data_pro_v3", finalHtml);
+        myCache.set("ieu_data_pro_v4", finalHtml);
         return finalHtml;
 
     } catch (e) {
