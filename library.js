@@ -33,7 +33,7 @@ function parseTurkishDateNoYear(dateStr) {
     return parseTurkishDate(`${parts[1]} ${parts[2]} ${currentYear}`);
 }
 
-plugin.init = async function (params) {};
+plugin.init = async function (params) { };
 
 plugin.defineWidgets = async function (widgets) {
     widgets.push({
@@ -57,7 +57,7 @@ async function getEvents() {
 
     try {
         console.log('[IEU Scraper] Siteye bağlanılıyor...');
-        const { data } = await axios.get('https://club.ieu.edu.tr/etkinlikler', {
+        const { data } = await axios.get('https://forum.ieu.app/ext/ieu/club/etkinlikler', {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             }
@@ -88,8 +88,8 @@ async function getEvents() {
             }
 
             // Düzeltmeler
-            if (img && !img.startsWith('http')) img = 'https://club.ieu.edu.tr' + img;
-            if (!img) img = 'https://club.ieu.edu.tr/sites/all/themes/ieu_theme/logo.png';
+            if (img && !img.startsWith('http')) img = 'https://forum.ieu.app/ext/ieu/club' + img;
+            if (!img) img = 'https://forum.ieu.app/ext/ieu/club/sites/all/themes/ieu_theme/logo.png';
 
             // Tarihi geçmiş etkinlikleri atla
             const eventDate = parseTurkishDate(fullDate);
@@ -175,7 +175,7 @@ async function getEvents() {
             <style>
                 .ieu-widget-wrapper {
                     position: relative;
-                    height: 480px;
+                    height: 526px;
                     overflow: hidden;
                     background: linear-gradient(160deg, #1a3a3a 0%, #0d2222 100%);
                     border-radius: 16px;
@@ -613,7 +613,7 @@ async function getSchoolEvents() {
 
     try {
         console.log('[IEU School Scraper] Siteye bağlanılıyor...');
-        const { data } = await axios.get('https://www.ieu.edu.tr/tr/events/type/all', {
+        const { data } = await axios.get('https://forum.ieu.app/ext/ieu/tr/events/type/all', {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             }
@@ -641,9 +641,9 @@ async function getSchoolEvents() {
             if (eventDate && eventDate < now) return;
 
             // URL düzeltmeleri
-            if (img && !img.startsWith('http')) img = 'https://www.ieu.edu.tr' + img;
-            if (!img) img = 'https://www.ieu.edu.tr/assets/ieu/images/logo/ieu-logo.png';
-            const fullLink = link && !link.startsWith('http') ? 'https://www.ieu.edu.tr' + link : link;
+            if (img && !img.startsWith('http')) img = 'https://forum.ieu.app/ext/ieu' + img;
+            if (!img) img = 'https://forum.ieu.app/ext/ieu/assets/ieu/images/logo/ieu-logo.png';
+            const fullLink = link && !link.startsWith('http') ? 'https://forum.ieu.app/ext/ieu' + link : link;
 
             if (title) {
                 events.push({
@@ -734,7 +734,7 @@ async function getSchoolEvents() {
             <style>
                 .ieus-widget-wrapper {
                     position: relative;
-                    height: 480px;
+                    height: 526px;
                     overflow: hidden;
                     background: linear-gradient(160deg, #1a3a3a 0%, #0d2222 100%);
                     border-radius: 16px;

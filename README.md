@@ -5,7 +5,7 @@ IEU Events Widget  is a Node.js plugin that automatically retrieves **Izmir Univ
 ## 🚀 Features
 
 - 🔄 Automatically fetches IEU events from  
-  **https://club.ieu.edu.tr/etkinlikler**
+  **https://forum.ieu.app/ext/ieu/club/etkinlikler**
 - 🧠 **1-hour in-memory caching** for improved performance
 - 🎞️ Auto-playing **slider (carousel)** layout
 - 🖼️ Modern UI with blurred background effects
