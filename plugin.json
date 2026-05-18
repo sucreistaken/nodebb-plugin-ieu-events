@@ -6,6 +6,7 @@
     "hooks": [
         { "hook": "static:app.load", "method": "init" },
         { "hook": "filter:widgets.getWidgets", "method": "defineWidgets" },
-        { "hook": "filter:widget.render:ieu-events-widget", "method": "renderWidget" }
+        { "hook": "filter:widget.render:ieu-events-widget", "method": "renderWidget" },
+        { "hook": "filter:widget.render:ieu-school-events-widget", "method": "renderSchoolWidget" }
     ]
 }
