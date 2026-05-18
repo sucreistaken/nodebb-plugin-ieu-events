@@ -33,6 +33,23 @@ function parseTurkishDateNoYear(dateStr) {
     return parseTurkishDate(`${parts[1]} ${parts[2]} ${currentYear}`);
 }
 
+// Tüm dış kaynak URL'lerini forum.ieu.app reverse-proxy üzerinden geçirir.
+// Okul ağında club.ieu.edu.tr / phoenix.ieu.edu.tr gibi domainler doğrudan
+// açılmadığı için, görsel/bağlantıların hepsi kendi domainimizden servis edilir.
+function proxify(url) {
+    if (!url) return url;
+    // protocol-relative -> https
+    if (url.startsWith('//')) url = 'https:' + url;
+    // root-relative: nginx sub_filter zaten bilinen domainleri /ext/ieu/...
+    // şekline çevirdiği için sadece kendi origin'imizi eklemek yeterli
+    if (url.startsWith('/')) return 'https://forum.ieu.app' + url;
+    // mutlak okul domainleri -> nginx reverse-proxy yollarına çevir
+    return url
+        .replace(/^https?:\/\/club\.ieu\.edu\.tr(?=\/|$)/i, 'https://forum.ieu.app/ext/ieu/club')
+        .replace(/^https?:\/\/(?:www\.)?ieu\.edu\.tr(?=\/|$)/i, 'https://forum.ieu.app/ext/ieu')
+        .replace(/^https?:\/\/phoenix\.ieu\.edu\.tr(?=\/|$)/i, 'https://forum.ieu.app/ext/ieu/phoenix');
+}
+
 plugin.init = async function (params) { };
 
 plugin.defineWidgets = async function (widgets) {
@@ -87,9 +104,9 @@ async function getEvents() {
                 }
             }
 
-            // Düzeltmeler
-            if (img && !img.startsWith('http')) img = 'https://forum.ieu.app/ext/ieu/club' + img;
-            if (!img) img = 'https://forum.ieu.app/ext/ieu/club/sites/all/themes/ieu_theme/logo.png';
+            // URL'leri forum.ieu.app reverse-proxy üzerinden geçir
+            img = proxify(img);
+            if (!img) img = proxify('https://club.ieu.edu.tr/sites/all/themes/ieu_theme/logo.png');
 
             // Tarihi geçmiş etkinlikleri atla
             const eventDate = parseTurkishDate(fullDate);
@@ -640,10 +657,10 @@ async function getSchoolEvents() {
             const eventDate = parseTurkishDateNoYear(dateText);
             if (eventDate && eventDate < now) return;
 
-            // URL düzeltmeleri
-            if (img && !img.startsWith('http')) img = 'https://forum.ieu.app/ext/ieu' + img;
-            if (!img) img = 'https://forum.ieu.app/ext/ieu/assets/ieu/images/logo/ieu-logo.png';
-            const fullLink = link && !link.startsWith('http') ? 'https://forum.ieu.app/ext/ieu' + link : link;
+            // URL'leri forum.ieu.app reverse-proxy üzerinden geçir
+            img = proxify(img);
+            if (!img) img = proxify('https://www.ieu.edu.tr/assets/ieu/images/logo/ieu-logo.png');
+            const fullLink = proxify(link);
 
             if (title) {
                 events.push({
