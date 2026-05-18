@@ -182,11 +182,32 @@ async function getEvents() {
                     margin-bottom: 20px;
                     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
                 }
+                .ieu-widget-title {
+                    position: absolute;
+                    top: 0; left: 0; right: 0;
+                    height: 46px;
+                    z-index: 20;
+                    display: flex;
+                    align-items: center;
+                    gap: 9px;
+                    padding: 0 16px;
+                    box-sizing: border-box;
+                    background: linear-gradient(180deg, #1f4443 0%, #163433 100%);
+                    border-bottom: 1px solid rgba(255,255,255,0.08);
+                    color: #fff;
+                    font-size: 13px;
+                    font-weight: 700;
+                    letter-spacing: 0.06em;
+                }
+                .ieu-widget-title i {
+                    color: #2ecc71;
+                    font-size: 14px;
+                }
                 .ieu-slide {
                     position: absolute;
                     width: 100%;
-                    height: 100%;
-                    top: 0; left: 0;
+                    height: calc(100% - 46px);
+                    top: 46px; left: 0;
                     opacity: 0;
                     transition: opacity 0.6s ease;
                     pointer-events: none;
@@ -367,7 +388,7 @@ async function getEvents() {
                 .ieu-dot:hover { background: rgba(255,255,255,0.5); }
                 .ieu-counter {
                     position: absolute;
-                    top: 14px;
+                    top: 60px;
                     right: 14px;
                     z-index: 10;
                     background: rgba(0,0,0,0.45);
@@ -486,6 +507,7 @@ async function getEvents() {
             </style>
 
             <div class="ieu-widget-wrapper">
+                <div class="ieu-widget-title"><i class="fa fa-users"></i><span>KULÜP ETKİNLİKLERİ</span></div>
                 <div id="ieu-slider-inner">
                     ${slidesHtml}
                 </div>
@@ -719,11 +741,32 @@ async function getSchoolEvents() {
                     margin-bottom: 20px;
                     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
                 }
+                .ieus-widget-title {
+                    position: absolute;
+                    top: 0; left: 0; right: 0;
+                    height: 46px;
+                    z-index: 20;
+                    display: flex;
+                    align-items: center;
+                    gap: 9px;
+                    padding: 0 16px;
+                    box-sizing: border-box;
+                    background: linear-gradient(180deg, #1f4443 0%, #163433 100%);
+                    border-bottom: 1px solid rgba(255,255,255,0.08);
+                    color: #fff;
+                    font-size: 13px;
+                    font-weight: 700;
+                    letter-spacing: 0.06em;
+                }
+                .ieus-widget-title i {
+                    color: #2ecc71;
+                    font-size: 14px;
+                }
                 .ieus-slide {
                     position: absolute;
                     width: 100%;
-                    height: 100%;
-                    top: 0; left: 0;
+                    height: calc(100% - 46px);
+                    top: 46px; left: 0;
                     opacity: 0;
                     transition: opacity 0.6s ease;
                     pointer-events: none;
@@ -905,7 +948,7 @@ async function getSchoolEvents() {
                 .ieus-dot:hover { background: rgba(255,255,255,0.5); }
                 .ieus-counter {
                     position: absolute;
-                    top: 14px;
+                    top: 60px;
                     right: 14px;
                     z-index: 10;
                     background: rgba(0,0,0,0.45);
@@ -1024,6 +1067,7 @@ async function getSchoolEvents() {
             </style>
 
             <div class="ieus-widget-wrapper">
+                <div class="ieus-widget-title"><i class="fa fa-graduation-cap"></i><span>OKUL ETKİNLİKLERİ</span></div>
                 <div id="ieus-slider-inner">
                     ${slidesHtml}
                 </div>
